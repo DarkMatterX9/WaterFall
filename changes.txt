@@ -1,0 +1,9 @@
+--> Created a master font that can be used everywhere. 
+--> Modified the toolbar to a set hight to look more sleek
+--> set the master font to 12pt
+--> set the new master font to all elements that were using Qfont
+--> created a combobox 
+Note: Instead of adding the QlineEdit (address bar) to the toolbar. Instead I have added it to the Combobox and added the Combobox to the Toolbar
+--> set content length to 60. 
+--> Created a completer (not working)
+Note: I do want to get autocomplete working for the QlineEdit and QComboBox. (MORE reasearch is required)

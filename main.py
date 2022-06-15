@@ -8,6 +8,7 @@ import os
 import sys
 
 HOMEPAGE = ""
+MASTER_FONT = QFont("Sanserif", 12)
 
 def main():
     # creating main window class
@@ -18,7 +19,7 @@ def main():
             super(MainWindow, self).__init__(*args, **kwargs)
 
             #set window title
-            self.setWindowTitle("WebBrowser")
+            self.setWindowTitle("WaterFall")
             #set window icon
             #self.setWindowIcon(QIcon("icons/python.png"))
             self.setGeometry(200, 200, 900, 600)
@@ -26,6 +27,9 @@ def main():
             #add toolbar
             toolbar = QToolBar()
             self.addToolBar(toolbar)
+
+            #toolbar settings
+            toolbar.setFixedHeight(30)
 
             #Back Button (toolbar)
             self.backButton = QPushButton()
@@ -53,22 +57,36 @@ def main():
 
             #address box (toolbar)
             self.addressLineEdit = QLineEdit()
-            self.addressLineEdit.setFont(QFont("Sanserif", 18))
+
+            #completer array
+            self.array_completer = []
+            completer = QCompleter(self.array_completer)
+            completer.setFilterMode(Qt.MatchFlag.MatchContains)
+
+            self.addressLineEdit.setFont(MASTER_FONT)
             self.addressLineEdit.returnPressed.connect(self.goBtn)
             self.addressLineEdit.mousePressEvent = lambda _ : self.addressLineEdit.selectAll()
+
+            #address bar (history)
+            self.addressHistory = QComboBox()
+            self.addressHistory.setFont(MASTER_FONT)
+            self.addressHistory.setLineEdit(self.addressLineEdit)
+            self.addressHistory.setMinimumContentsLength(60)
+            self.addressHistory.setCompleter(completer)
 
             #search Button (toolbar)
             self.searchButton = QPushButton()
             self.searchButton.setText("GO")
-            self.searchButton.setFont(QFont("Sanserif", 18))
+            self.searchButton.setFont(MASTER_FONT)
             self.searchButton.clicked.connect(self.goBtn)
+        
 
             #add objects to toolbar
             toolbar.addWidget(self.backButton)
             toolbar.addWidget(self.forwardButton)
             toolbar.addWidget(self.reloadButton)
             toolbar.addWidget(self.homeButton)
-            toolbar.addWidget(self.addressLineEdit)
+            toolbar.addWidget(self.addressHistory)
             toolbar.addWidget(self.searchButton)
 
             # Creating a QWebEngineView
@@ -86,19 +104,30 @@ def main():
         #Function to execute on go btn press
         def goBtn(self):
             url = self.addressLineEdit.text()
+            if (self.addressHistory.findText(url) == -1):
+                self.addressHistory.addItem(url)
+                self.array_completer.append(url)
+            else:
+                pass
+
             self.browser.load(QUrl(url))
             self.addressLineEdit.setFocus()
             self.addressLineEdit.selectAll()
 
+        # back button (previous webpage backwards)
         def backBtn(self):
             self.browser.back()
 
+        # forward button (previouos webpage forward)
         def forwardBtn(self):
             self.browser.forward()
 
+        # Home button (navigates to the home page)
         def homeBtn(self):
             self.browser.load(QUrl(HOMEPAGE))
+            self.addressLineEdit.setText(HOMEPAGE)
 
+        # reload button (reload the current webpage)
         def reloadBtn(self):
             self.browser.reload()
 
@@ -109,6 +138,7 @@ def main():
     # execute now
     app.exec_()
 
+# execute this first
 if __name__ == "__main__":
     # Set homepage
     HOMEPAGE = "https://www.google.com"
